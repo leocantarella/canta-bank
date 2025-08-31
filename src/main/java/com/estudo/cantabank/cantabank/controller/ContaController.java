@@ -1,17 +1,17 @@
 package com.estudo.cantabank.cantabank.controller;
 
-import com.estudo.cantabank.cantabank.dto.DepositoRequest;
-import com.estudo.cantabank.cantabank.dto.SaqueRequest;
-import com.estudo.cantabank.cantabank.dto.TransferenciaRequest;
+import ch.qos.logback.core.net.server.Client;
+import com.estudo.cantabank.cantabank.dto.*;
+import com.estudo.cantabank.cantabank.model.Cliente;
 import com.estudo.cantabank.cantabank.model.Conta;
 import com.estudo.cantabank.cantabank.service.ContaService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @AllArgsConstructor
 
@@ -22,10 +22,17 @@ public class ContaController {
     private final ContaService contaService;
 
     //Método de criação de contas
-    @PostMapping("/criarconta")
-    public ResponseEntity<Conta> criarConta(@RequestBody  Conta conta){
-        Conta novaConta = contaService.criarConta(conta);
-        return ResponseEntity.status(201).body(novaConta);
+    @PostMapping("/criar/{clienteId}")
+    public ResponseEntity<Long> criarConta(
+            @PathVariable Long clienteId,
+            @RequestBody @Valid CriarContaRequest request) {
+
+        // Cria a conta
+        Conta contaCriada = contaService.criarConta(clienteId, request);
+
+        // Retorna 201 Created e o ID da nova conta
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(contaCriada.getId());
     }
 
     //Método para transferência
@@ -56,5 +63,11 @@ public class ContaController {
     public ResponseEntity<String> depositar(@RequestBody @Valid DepositoRequest depositoRequest){
         contaService.depositar(depositoRequest);
         return ResponseEntity.ok("Depósito realizado com sucesso!");
+    }
+
+    //Listar contas
+    @GetMapping("/lista")
+    public List<Conta> listarContas() {
+       return contaService.listarContas();
     }
 }

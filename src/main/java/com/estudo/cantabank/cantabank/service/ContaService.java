@@ -1,15 +1,20 @@
 package com.estudo.cantabank.cantabank.service;
+import com.estudo.cantabank.cantabank.dto.ContaResponseDTO;
+import com.estudo.cantabank.cantabank.dto.CriarClienteRequest;
+import com.estudo.cantabank.cantabank.dto.CriarContaRequest;
 import com.estudo.cantabank.cantabank.dto.DepositoRequest;
 import com.estudo.cantabank.cantabank.exception.ContaNaoEncontradaException;
+import com.estudo.cantabank.cantabank.model.Cliente;
 import com.estudo.cantabank.cantabank.model.Conta;
+import com.estudo.cantabank.cantabank.repository.ClienteRepository;
 import com.estudo.cantabank.cantabank.repository.ContaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 
@@ -17,11 +22,22 @@ import java.util.Optional;
 public class ContaService {
 
     private final ContaRepository contaRepository;
+    private final ClienteRepository clienteRepository;
 
     //Método de criação de conta
 
-    public Conta criarConta(Conta conta){
-      return  contaRepository.save(conta);
+    public Conta criarConta(Long id, CriarContaRequest request) {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow
+                (() -> new RuntimeException("Cliente não encontrado!"));
+        Conta conta = new Conta();
+        conta.setCliente(cliente);
+        conta.setSaldo(request.getSaldo());
+        return contaRepository.save(conta);
+    }
+
+    //Listar contas
+    public List<Conta> listarContas(){
+        return contaRepository.findAll();
     }
     
     //Método de listagem de conta por ID
