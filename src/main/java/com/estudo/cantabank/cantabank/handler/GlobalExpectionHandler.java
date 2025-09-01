@@ -1,6 +1,6 @@
 package com.estudo.cantabank.cantabank.handler;
 
-import com.estudo.cantabank.cantabank.exception.ContaNaoEncontradaException;
+import com.estudo.cantabank.cantabank.exception.NaoEncontadoExeption;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,8 +12,8 @@ import java.util.Map;
 public class GlobalExpectionHandler {
 
     //Conta não encontrada
-    @ExceptionHandler(ContaNaoEncontradaException.class)
-    public ResponseEntity<Map<String, Object>> handleContaNaoEncontrada(ContaNaoEncontradaException ex){
+    @ExceptionHandler(NaoEncontadoExeption.class)
+    public ResponseEntity<Map<String, Object>> handleContaNaoEncontrada(NaoEncontadoExeption ex){
         Map<String, Object> body = new HashMap<>();
         body.put("Erro", ex.getMessage());
         body.put("Status", HttpStatus.NOT_FOUND.value());

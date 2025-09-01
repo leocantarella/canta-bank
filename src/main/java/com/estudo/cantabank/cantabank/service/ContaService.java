@@ -1,20 +1,16 @@
 package com.estudo.cantabank.cantabank.service;
-import com.estudo.cantabank.cantabank.dto.ContaResponseDTO;
-import com.estudo.cantabank.cantabank.dto.CriarClienteRequest;
 import com.estudo.cantabank.cantabank.dto.CriarContaRequest;
 import com.estudo.cantabank.cantabank.dto.DepositoRequest;
-import com.estudo.cantabank.cantabank.exception.ContaNaoEncontradaException;
+import com.estudo.cantabank.cantabank.exception.NaoEncontadoExeption;
 import com.estudo.cantabank.cantabank.model.Cliente;
 import com.estudo.cantabank.cantabank.model.Conta;
 import com.estudo.cantabank.cantabank.repository.ClienteRepository;
 import com.estudo.cantabank.cantabank.repository.ContaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 
@@ -49,7 +45,7 @@ public class ContaService {
     //Método de depoósito
     public void depositar(DepositoRequest request){
         Conta conta = contaRepository.findById(request.getIdConta())
-                .orElseThrow(() -> new ContaNaoEncontradaException("Conta com o ID" + request.getIdConta() + " não encontrada!"));
+                .orElseThrow(() -> new NaoEncontadoExeption("Conta com o ID" + request.getIdConta() + " não encontrada!"));
         if (request.getValor() <= 0) {
             throw new RuntimeException("Valor inválido!");
         }
@@ -61,16 +57,16 @@ public class ContaService {
     //Método para saque
     public void sacar(Long idConta, Double valor, Long idCliente){
         Conta conta = contaRepository.findById(idConta)
-                .orElseThrow(() -> new ContaNaoEncontradaException("Conta não encontrada!"));
+                .orElseThrow(() -> new NaoEncontadoExeption("Conta não encontrada!"));
         if (!conta.getCliente().getId().equals(idCliente)){
-            throw new ContaNaoEncontradaException("O usuário não é o dono da conta!");}
+            throw new NaoEncontadoExeption("O usuário não é o dono da conta!");}
 
         if (conta.getSaldo() < valor) {
-            throw new ContaNaoEncontradaException("Saldo insuficiente!");
+            throw new NaoEncontadoExeption("Saldo insuficiente!");
         }
 
         if (valor <= 0){
-            throw new ContaNaoEncontradaException("Valor inválido!");
+            throw new NaoEncontadoExeption("Valor inválido!");
         }
         conta.setSaldo(conta.getSaldo() - valor);
         contaRepository.save(conta);
@@ -79,11 +75,11 @@ public class ContaService {
     // método para transferência
     public void transferir(Long idCliente, Long idContaSaida, Long idContaDestino, Double valor){
         Conta contaSaida = contaRepository.findById(idContaSaida).
-                orElseThrow(() -> new ContaNaoEncontradaException("Conta saída não encontrada"));
+                orElseThrow(() -> new NaoEncontadoExeption("Conta saída não encontrada"));
         Conta contaDestino = contaRepository.findById(idContaDestino)
-                .orElseThrow(() -> new ContaNaoEncontradaException("Conta destino não encontrada"));
+                .orElseThrow(() -> new NaoEncontadoExeption("Conta destino não encontrada"));
         if (!contaSaida.getCliente().getId().equals(idCliente)){
-            throw new ContaNaoEncontradaException("O cliente não é dono da conta!");
+            throw new NaoEncontadoExeption("O cliente não é dono da conta!");
         }
         if (contaSaida.getSaldo() < valor){
             throw new RuntimeException("Saldo insuficiente!");

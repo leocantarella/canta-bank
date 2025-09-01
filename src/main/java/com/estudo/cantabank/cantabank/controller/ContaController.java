@@ -26,10 +26,7 @@ public class ContaController {
     public ResponseEntity<Long> criarConta(
             @PathVariable Long clienteId,
             @RequestBody @Valid CriarContaRequest request) {
-
-        // Cria a conta
         Conta contaCriada = contaService.criarConta(clienteId, request);
-
         // Retorna 201 Created e o ID da nova conta
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(contaCriada.getId());
